@@ -1,0 +1,26 @@
+version: '3'
+tasks:
+  build:
+    desc: Build the Go CLI binary
+    cmds:
+      - mkdir -p .bin
+      - go build -o .bin/cloudstart cmd/cloudstart/main.go
+  run:
+    desc: Run the cloudstart CLI (alias for .bin/cloudstart, forwards all args)
+    deps: [build]
+    cmds:
+      - .bin/cloudstart {{.CLI_ARGS}}
+  cleanup:
+    desc: Remove built binaries and temporary files
+    cmds:
+      - rm -rf .bin 
+  e2e:
+    desc: Run all Ginkgo e2e tests
+    dir: tests
+    cmds:
+      - |
+        if [ -x "$(go env GOPATH)/bin/ginkgo" ]; then
+          $(go env GOPATH)/bin/ginkgo -v
+        else
+          go test -v ./...
+        fi 

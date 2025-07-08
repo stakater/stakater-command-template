@@ -1,0 +1,6 @@
+app:
+  name: cloudstart
+  version: 1.0.0
+cloud:
+  provider: aws
+  region: us-west-2
