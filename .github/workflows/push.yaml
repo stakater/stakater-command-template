@@ -39,10 +39,13 @@ jobs:
           name: cloudstart
           path: .bin/cloudstart
 
-  release:
+  tag-and-release:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Download CLI binary artifact
         uses: actions/download-artifact@v4
         with:
@@ -52,12 +55,21 @@ jobs:
       - name: Move binary to root for release
         run: mv .bin/cloudstart ./cloudstart
 
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch
+          release_branches: main
+          tag_prefix: v
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.sha }}
-          name: "Cloudstart CLI ${{ github.sha }}"
-          body: "Automated release for commit ${{ github.sha }}"
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          name: "Cloudstart CLI ${{ steps.tag_version.outputs.new_tag }}"
+          body: "Automated release for ${{ steps.tag_version.outputs.new_tag }}"
           files: ./cloudstart
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
