@@ -1,7 +1,26 @@
 package main
 
-import "stakater-cmd/pkg/cli"
+import (
+	"log"
+
+	"github.com/spf13/cobra"
+	"go.uber.org/dig"
+
+	"stakater-cmd/pkg/cli"
+)
 
 func main() {
-	cli.Execute()
+	c := dig.New()
+	// Provide dependencies
+	c.Provide(cli.DigConfigProvider)
+	c.Provide(cli.DigRootCmd)
+	// Invoke CLI execution
+	err := c.Invoke(func(rootCmd *cobra.Command) {
+		if err := rootCmd.Execute(); err != nil {
+			log.Fatal(err)
+		}
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }

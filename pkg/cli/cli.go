@@ -10,41 +10,32 @@ import (
 	"stakater-cmd/internal/info"
 )
 
-func newRootCmd() *cobra.Command {
+// DigConfigProvider provides a config.Provider based on the --env flag.
+func DigConfigProvider() (config.Provider, error) {
 	var env string
-	providerHolder := &info.ProviderHolder{}
+	for i, arg := range os.Args {
+		if arg == "--env" && i+1 < len(os.Args) {
+			env = os.Args[i+1]
+			break
+		}
+	}
+	if env != "" {
+		overridePath := fmt.Sprintf("configs/config.%s.yaml", env)
+		return config.NewYAML(
+			config.File("configs/config.yaml"),
+			config.File(overridePath),
+		)
+	}
+	return config.NewYAML(config.File("configs/config.yaml"))
+}
 
+// DigRootCmd provides the root Cobra command with injected config.Provider.
+func DigRootCmd(cfg config.Provider) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "cloudstart",
 		Short: "cloudstart is a CLI tool for cloud operations",
 	}
-	rootCmd.PersistentFlags().StringVar(&env, "env", "", "Environment (e.g. local)")
-
-	infoCmd := info.NewInfoCommand(providerHolder)
-	rootCmd.AddCommand(infoCmd)
-
-	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
-		var err error
-		if env != "" {
-			overridePath := fmt.Sprintf("configs/config.%s.yaml", env)
-			providerHolder.Provider, err = config.NewYAML(
-				config.File("configs/config.yaml"),
-				config.File(overridePath),
-			)
-		} else {
-			providerHolder.Provider, err = config.NewYAML(config.File("configs/config.yaml"))
-		}
-		return err
-	}
-
+	rootCmd.PersistentFlags().String("env", "", "Environment (e.g. local)")
+	rootCmd.AddCommand(info.NewInfoCommand(&info.ProviderHolder{Provider: cfg}))
 	return rootCmd
-}
-
-func Execute() {
-	rootCmd := newRootCmd()
-
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 }
