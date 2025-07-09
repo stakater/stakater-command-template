@@ -37,7 +37,7 @@ jobs:
           name: cloudstart
           path: .bin/cloudstart
 
-  tag-and-release:
+  release:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
