@@ -22,6 +22,44 @@ A production-ready Go CLI tool template using Uber dig, Uber Config, and Cobra.
 └── README.md
 ```
 
+## Configuration
+
+### Configuration Override
+
+The CLI supports environment-specific configuration overrides using the `--env` flag:
+
+- **Default config**: `configs/config.yaml`
+- **Environment override**: `configs/config.{env}.yaml`
+
+When you specify `--env <environment>`, the CLI will:
+1. Load the base configuration from `configs/config.yaml`
+2. Override with environment-specific settings from `configs/config.{env}.yaml`
+
+#### Example Configuration Files
+
+**Base config (`configs/config.yaml`):**
+```yaml
+app:
+  name: cloudstart
+  version: 1.0.0
+cloud:
+  provider: aws
+  region: us-west-2
+```
+
+**Local override (`configs/config.local.yaml`):**
+```yaml
+cloud:
+  region: us-east-1
+```
+
+**E2E override (`configs/config.e2e.yaml`):**
+```yaml
+cloud:
+  provider: gcp
+  region: europe-west1
+```
+
 ## Usage
 
 ### Build
@@ -33,6 +71,19 @@ task build
 ```sh
 task run -- info
 task run -- info --env local
+task run -- info --env e2e
+```
+
+#### Usage Examples
+
+```sh
+# Use default config
+task run -- info
+
+# Use local environment override
+task run -- info --env local
+
+# Use e2e environment override  
 task run -- info --env e2e
 ```
 

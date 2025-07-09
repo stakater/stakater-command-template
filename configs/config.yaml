@@ -1,6 +1,6 @@
 app:
-  name: cloudstart
-  version: 1.0.0
+  name: ${NAME}
+  version: ${VERSION}
 cloud:
-  provider: aws
-  region: us-west-2
+  provider: ${PROVIDER}
+  region: ${REGION}
