@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cloudstart
-          path: bin/cloudstart
+          path: .bin/cloudstart
 
   release:
     needs: build-and-test
@@ -47,7 +47,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: cloudstart
-          path: ./
+          path: .bin/
+
+      - name: Move binary to root for release
+        run: mv .bin/cloudstart ./cloudstart
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
