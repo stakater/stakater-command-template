@@ -3,25 +3,33 @@ package info
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
-	"go.uber.org/config"
+	"github.com/spf13/viper"
 )
 
-func NewInfoCommand(cfg config.Provider) *cobra.Command {
-	return &cobra.Command{
+func NewInfoCommand(cfg *viper.Viper) *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "info",
 		Short: "Print parsed config information",
 		Run: func(cmd *cobra.Command, args []string) {
-			if cfg == nil {
-				fmt.Println("Config not loaded")
-				os.Exit(1)
-			}
-			fmt.Printf("App Name: %s\n", cfg.Get("app.name").String())
-			fmt.Printf("App Version: %s\n", cfg.Get("app.version").String())
-			fmt.Printf("Cloud Provider: %s\n", cfg.Get("cloud.provider").String())
-			fmt.Printf("Cloud Region: %s\n", cfg.Get("cloud.region").String())
+			fmt.Printf("App Name: %s\n", cfg.GetString("app.name"))
+			fmt.Printf("App Version: %s\n", cfg.GetString("app.version"))
+			fmt.Printf("Cloud Provider: %s\n", cfg.GetString("cloud.provider"))
+			fmt.Printf("Cloud Region: %s\n", cfg.GetString("cloud.region"))
 		},
 	}
+
+	cmd.Flags().String("name", "", "App name")
+	cmd.Flags().String("version", "", "App version")
+	cmd.Flags().String("provider", "", "Cloud provider")
+	cmd.Flags().String("region", "", "Cloud region")
+
+	// Bind flags to Viper
+	cfg.BindPFlag("app.name", cmd.Flags().Lookup("name"))
+	cfg.BindPFlag("app.version", cmd.Flags().Lookup("version"))
+	cfg.BindPFlag("cloud.provider", cmd.Flags().Lookup("provider"))
+	cfg.BindPFlag("cloud.region", cmd.Flags().Lookup("region"))
+
+	return cmd
 }
