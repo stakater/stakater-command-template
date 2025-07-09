@@ -105,5 +105,34 @@ Cloud Region: us-west-2
 - Go 1.22+
 - [Task](https://taskfile.dev) (for task runner)
 
+## Versioning and Automated Releases
+
+This project uses automated semantic versioning and release notes based on commit messages, following the Angular/Conventional Commits convention. The version bump is determined by your commit message prefix:
+
+- **fix:** → PATCH release (e.g., v1.2.0 → v1.2.1)
+- **feat:** → MINOR release (e.g., v1.2.0 → v1.3.0)
+- **BREAKING CHANGE:** in the body or footer → MAJOR release (e.g., v1.2.0 → v2.0.0)
+
+### Examples
+
+- **Patch release:**
+  ```
+  fix: correct typo in CLI output
+  
+  This fixes a small typo in the help message.
+  ```
+- **Minor release:**
+  ```
+  feat: add new cloud provider support
+  ```
+- **Major release:**
+  ```
+  feat: overhaul config system
+  
+  BREAKING CHANGE: config file format is now YAML only
+  ```
+
+When you push to the main branch with one of these commit messages, the CI will automatically bump the version and create a new release accordingly.
+
 ---
 This template is ready for production use and extensible for new commands and features.
