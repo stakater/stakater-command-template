@@ -61,6 +61,10 @@ jobs:
           default_bump: patch
           release_branches: main
           tag_prefix: v
+          custom_release_rules: |
+            feat:minor
+            fix:patch
+            BREAKING CHANGE:major
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
