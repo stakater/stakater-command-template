@@ -6,13 +6,14 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/dig"
 
+	"stakater-cmd/internal/config"
 	"stakater-cmd/pkg/cli"
 )
 
 func main() {
 	c := dig.New()
 	// Provide dependencies
-	c.Provide(cli.Config)
+	c.Provide(config.InitConfig)
 	c.Provide(cli.CommandRegister)
 	c.Provide(cli.DigRootCmd)
 	// Invoke CLI execution
