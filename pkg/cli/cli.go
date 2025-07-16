@@ -6,7 +6,7 @@ import (
 )
 
 // DigRootCmd provides the root Cobra command with injected *viper.Viper and command register.
-func DigRootCmd(cfg *viper.Viper, commandRegister []CommandProvider) *cobra.Command {
+func DigRootCmd(cfgViper *viper.Viper, commandRegister []CommandProvider) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "cloudstart",
 		Short: "cloudstart is a CLI tool for cloud operations",
@@ -14,7 +14,7 @@ func DigRootCmd(cfg *viper.Viper, commandRegister []CommandProvider) *cobra.Comm
 	rootCmd.PersistentFlags().String("env", "", "Environment (e.g. local)")
 
 	for _, provider := range commandRegister {
-		rootCmd.AddCommand(provider(cfg))
+		rootCmd.AddCommand(provider(cfgViper))
 	}
 	return rootCmd
 }

@@ -1,4 +1,4 @@
-package cli
+package config
 
 import (
 	"os"
@@ -56,8 +56,14 @@ cloud:
 `
 		writeTempConfig(override, filepath.Join(configDir, "config.test.yaml"))
 		os.Args = []string{"cmd", "--env", "test"}
-		v, err := Config()
+
+		v, err := InitConfig()
 		Expect(err).To(BeNil())
+		cfg, err := GetConfig(v)
+		Expect(err).To(BeNil())
+
+		Expect(cfg.Cloud.Region).To(Equal("eu-central-1"))
+		Expect(cfg.Cloud.Provider).To(Equal("aws"))
 		Expect(v.GetString("cloud.region")).To(Equal("eu-central-1"))
 		Expect(v.GetString("cloud.provider")).To(Equal("aws"))
 	})
@@ -66,8 +72,13 @@ cloud:
 		os.Setenv("CLOUD_REGION", "env-region")
 		DeferCleanup(func() { os.Unsetenv("CLOUD_REGION") })
 		os.Args = []string{"cmd"}
-		v, err := Config()
+
+		v, err := InitConfig()
 		Expect(err).To(BeNil())
+		cfg, err := GetConfig(v)
+		Expect(err).To(BeNil())
+
+		Expect(cfg.Cloud.Region).To(Equal("env-region"))
 		Expect(v.GetString("cloud.region")).To(Equal("env-region"))
 	})
 
@@ -76,9 +87,16 @@ cloud:
 		fs.String("region", "", "")
 		fs.Parse([]string{"--region", "arg-region"})
 		os.Args = []string{"cmd"}
-		v, err := Config()
+
+		v, err := InitConfig()
 		Expect(err).To(BeNil())
+
 		v.BindPFlag("cloud.region", fs.Lookup("region"))
+
+		cfg, err := GetConfig(v)
+		Expect(err).To(BeNil())
+
+		Expect(cfg.Cloud.Region).To(Equal("arg-region"))
 		Expect(v.GetString("cloud.region")).To(Equal("arg-region"))
 	})
 })

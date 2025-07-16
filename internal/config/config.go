@@ -1,4 +1,4 @@
-package cli
+package config
 
 import (
 	"fmt"
@@ -8,8 +8,20 @@ import (
 	"github.com/spf13/viper"
 )
 
+type Config struct {
+	App struct {
+		Name    string `mapstructure:"name"`
+		Version string `mapstructure:"version"`
+	} `mapstructure:"app"`
+
+	Cloud struct {
+		Provider string `mapstructure:"provider"`
+		Region   string `mapstructure:"region"`
+	} `mapstructure:"cloud"`
+}
+
 // Config provides a Viper instance for configuration management.
-func Config() (*viper.Viper, error) {
+func InitConfig() (*viper.Viper, error) {
 	var env string
 
 	// Parse --env argument
@@ -42,4 +54,13 @@ func Config() (*viper.Viper, error) {
 	}
 
 	return v, nil
+}
+
+func GetConfig(cfgViper *viper.Viper) (*Config, error) {
+	var cfgObj Config
+	if err := cfgViper.Unmarshal(&cfgObj); err != nil {
+		return nil, err
+	}
+
+	return &cfgObj, nil
 }
