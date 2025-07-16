@@ -1,9 +1,8 @@
-package cli
+package config
 
 import (
 	"os"
 	"path/filepath"
-	"stakater-cmd/internal/config"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -58,9 +57,9 @@ cloud:
 		writeTempConfig(override, filepath.Join(configDir, "config.test.yaml"))
 		os.Args = []string{"cmd", "--env", "test"}
 
-		v, err := config.InitConfig()
+		v, err := InitConfig()
 		Expect(err).To(BeNil())
-		cfg, err := config.GetConfig(v)
+		cfg, err := GetConfig(v)
 		Expect(err).To(BeNil())
 
 		Expect(cfg.Cloud.Region).To(Equal("eu-central-1"))
@@ -74,9 +73,9 @@ cloud:
 		DeferCleanup(func() { os.Unsetenv("CLOUD_REGION") })
 		os.Args = []string{"cmd"}
 
-		v, err := config.InitConfig()
+		v, err := InitConfig()
 		Expect(err).To(BeNil())
-		cfg, err := config.GetConfig(v)
+		cfg, err := GetConfig(v)
 		Expect(err).To(BeNil())
 
 		Expect(cfg.Cloud.Region).To(Equal("env-region"))
@@ -89,12 +88,12 @@ cloud:
 		fs.Parse([]string{"--region", "arg-region"})
 		os.Args = []string{"cmd"}
 
-		v, err := config.InitConfig()
+		v, err := InitConfig()
 		Expect(err).To(BeNil())
 
 		v.BindPFlag("cloud.region", fs.Lookup("region"))
 
-		cfg, err := config.GetConfig(v)
+		cfg, err := GetConfig(v)
 		Expect(err).To(BeNil())
 
 		Expect(cfg.Cloud.Region).To(Equal("arg-region"))
